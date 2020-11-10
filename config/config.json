@@ -1,0 +1,11 @@
+{
+    "appName": "TestApp",
+    "url": "http://localhost:3000/",
+    "dbURI": "mongodb://localhost:27017/myTestAPP",
+    "sessionSecret": "myTestAPP",
+    "SMTP_HOST": "smtp.gmail.com",
+    "SMTP_PORT": 465,
+    "SMTP_USER": "keshavgarg0696@gmail.com",
+    "SMTP_PASSWORD":"hack@123",
+    "SMTP_FROM": "keshavgarg0696@gmail.com"
+  }
