@@ -15,15 +15,22 @@ const Mailer = require('../core/mail')
 const FacebookTokenStrategy = require('passport-facebook-token');
 // const GoogleTokenStrategy = require('passport-google-token');
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
-  });
+// passport.serializeUser(function(user, done) {
+//     done(null, user.id);
+//   });
  
-  passport.deserializeUser(function(id, done) {
-    User.getUserById(id, function(err, user) {
-      done(err, user);
-    });
-  });
+//   passport.deserializeUser(function(id, done) {
+//     User.getUserById(id, function(err, user) {
+//       done(err, user);
+//     });
+//   });
+
+
+var { generateToken, sendToken } = require('../utils/token.utils');
+var outhConfig = require('../outhConfig');
+var request = require('request');
+require('../passport')();
+
 
 // Register User
 router.post('/register', async function(req, res){
@@ -124,104 +131,6 @@ router.post('/register', async function(req, res){
     })
 }
 
-
-  passport.use(new GoogleTokenStrategy({
-    clientID: '986961472243-fulld3ffucmhascuns30o5k39i93hktc.apps.googleusercontent.com',
-    clientSecret: 'TXJjvl8v7n-hX5Arr7LjzboP'
-  },
-  function(accessToken, refreshToken, profile, done) {
-    User.findOne({ 'googleId' : profile.id }, function(err, user) {
-      if (err) return done(err);
-      if (user)  {
-        const token = jwt.sign({user}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
-        user.token = token;
-        return done(null, user);
-    }
-      else {
-        // if there is no user found with that facebook id, create them
-        var newUser = new User();
-  
-        // set all of the facebook information in our user model
-        newUser.googleId = profile.id;
-        // newUser.token = accessToken;
-        const token = jwt.sign({newUser}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
-        newUser.token = token;
-        newUser.role = "MEMBER";
-        newUser.firstname  = profile.displayName.split(' ').slice(0, -1).join(' ');
-        newUser.lastname  = profile.displayName.split(' ').slice(-1).join(' ');
-
-        newUser.type  = 'google';
-        if (typeof profile.emails != 'undefined' && profile.emails.length > 0)
-          newUser.email = profile.emails[0].value;
-  
-        // save our user to the database
-        newUser.save(function(err) {
-          if (err) throw err;
-          return done(null, newUser);
-        });
-      }
-    });
-  }
-));
-
-router.post('/google/token',
-  passport.authenticate('google-token'),
-  function (req, res) {
-    // do something with req.user
-    // res.send(req.user? 200 : 401);
-    res.status(req.user? 200 : 401).json({user: req.user}).end();
-  });
-
-
-  passport.use(new FacebookTokenStrategy({
-    // clientID: '578617303046530',
-    // clientSecret: 'db3754a847c830d48c4b9581138aedc3',
-    clientID: '805856186862870',
-    clientSecret: 'f71b203d46e2a3b37ca3e2abb3ff7477',
-    fbGraphVersion: 'v3.0'
-  }, function(accessToken, refreshToken, profile, done) {
-    User.findOne({ 'facebookId' : profile.id }, function(err, user) {
-      if (err) return done(err);
-      if (user) {
-          const token = jwt.sign({user}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
-          user.token = token;
-          return done(null, user);
-      }
-      else {
-        // if there is no user found with that facebook id, create them
-        var newUser = new User();
-  
-        // set all of the facebook information in our user model
-        newUser.facebookId = profile.id;
-        const token = jwt.sign({newUser}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
-        newUser.token = token;
-        newUser.role = "MEMBER";
-        newUser.firstname  = profile.displayName.split(' ').slice(0, -1).join(' ');
-        newUser.lastname  = profile.displayName.split(' ').slice(-1).join(' ');
-
-        newUser.type  = 'facebook';
-        if (typeof profile.emails != 'undefined' && profile.emails.length > 0)
-          newUser.email = profile.emails[0].value;
-  
-        // save our user to the database
-        newUser.save(function(err) {
-          if (err) throw err;
-          return done(null, newUser);
-        });
-      }
-    });
-  }
-));
-
-
-router.post('/facebook/token',
-  passport.authenticate('facebook-token'),
-  function (req, res) {
-    // do something with req.user
-    // res.send(req.user? 200 : 401);
-    res.status(req.user? 200 : 401).json({user: req.user}).end();
-  });
-
   //   // Endpoint to login
 // /* POST login. */
 router.post('/login', function (req, res, next) {
@@ -274,6 +183,84 @@ passport.use(new LocalStrategy({
    });
   }
 ));
+
+router
+    .post('/twitter/reverse',function(req, res) {
+        request.post({
+            url: 'https://api.twitter.com/oauth/request_token',
+            oauth: {
+                oauth_callback: "http%3A%2F%2Flocalhost%3A3000%2Ftwitter-callback",
+                consumer_key: outhConfig.twitterAuth.consumerKey,
+                consumer_secret: outhConfig.twitterAuth.consumerSecret
+            }
+        }, function (err, r, body) {
+            if (err) {
+                return res.send(500, { message: e.message });
+            }
+            var jsonStr = '{ "' + body.replace(/&/g, '", "').replace(/=/g, '": "') + '"}';
+            res.send(JSON.parse(jsonStr));
+        });
+    });
+
+router
+    .post('/twitter', (req, res, next) => {
+        request.post({
+            url: `https://api.twitter.com/oauth/access_token?oauth_verifier`,
+            oauth: {
+                consumer_key: outhConfig.twitterAuth.consumerKey,
+                consumer_secret: outhConfig.twitterAuth.consumerSecret,
+                token: req.query.oauth_token
+            },
+            form: { oauth_verifier: req.query.oauth_verifier }
+        }, function (err, r, body) {
+            if (err) {
+                return res.send(500, { message: err.message });
+            }
+
+            const bodyString = '{ "' + body.replace(/&/g, '", "').replace(/=/g, '": "') + '"}';
+            const parsedBody = JSON.parse(bodyString);
+
+            req.body['oauth_token'] = parsedBody.oauth_token;
+            req.body['oauth_token_secret'] = parsedBody.oauth_token_secret;
+            req.body['user_id'] = parsedBody.user_id;
+
+            next();
+        });
+    }, passport.authenticate('twitter-token', {session: false}), function(req, res, next) {
+        if (!req.user) {
+            return res.send(401, 'User Not Authenticated');
+        }
+        req.auth = {
+            id: req.user.id
+        };
+
+        return next();
+    }, generateToken, sendToken);
+
+router
+    .post('/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res, next) {
+        if (!req.user) {
+            return res.send(401, 'User Not Authenticated');
+        }
+        req.auth = {
+            id: req.user.id
+        };
+
+        next();
+    }, generateToken, sendToken);
+
+router
+    .post('/google' , passport.authenticate('google-token', {session: false}), function(req, res, next) {
+        if (!req.user) {
+            return res.send(401, 'User Not Authenticated');
+        }
+        req.auth = {
+            id: req.user.id
+        };
+
+        next();
+    }, generateToken, sendToken);
+
 
 router.get('/logout', function(req, res){
 req.logout();

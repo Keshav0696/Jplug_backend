@@ -72,36 +72,36 @@ res.send("SUCCESS")
 
 const User = mongoose.model('User')
 
-passport.use(new JWTStrategy({
-        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-        secretOrKey   : '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4'
-    },
-    function (jwtPayload, cb) {
-        //find the user in db if needed. This functionality may be omitted if you store everything you'll need in JWT payload.
-       let user =  jwtPayload.user ? jwtPayload.user : jwtPayload.newUser;
-        return User.findOne({_id : user._id})
-            .then(user => {
-                return cb(null, user);
-            })
-            .catch(err => {
-              // applogger.info('Jwt Third console', err);
-                return cb(err);
-            });
-    }
-));
+// passport.use(new JWTStrategy({
+//         jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+//         secretOrKey   : '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4'
+//     },
+//     function (jwtPayload, cb) {
+//         //find the user in db if needed. This functionality may be omitted if you store everything you'll need in JWT payload.
+//        let user =  jwtPayload.user ? jwtPayload.user : jwtPayload.newUser;
+//         return User.findOne({_id : user._id})
+//             .then(user => {
+//                 return cb(null, user);
+//             })
+//             .catch(err => {
+//               // applogger.info('Jwt Third console', err);
+//                 return cb(err);
+//             });
+//     }
+// ));
 
-function jwt (req, res, next){
-  passport.authenticate('jwt', { session: false }, function(err, user, info) { 
-      if (err) { return next(err); } 
-      applogger.info('Jwt Second  console',{ user, err});
+// function jwt (req, res, next){
+//   passport.authenticate('jwt', { session: false }, function(err, user, info) { 
+//       if (err) { return next(err); } 
+//       applogger.info('Jwt Second  console',{ user, err});
 
-      if (!user) { return res.send("Custom Unauthorised").end(); } 
-      // edit as per comment
-      //return res.send("Test Route Accessed").end();
-      req.user = user;   // Forward user information to the next middleware
-      next();
-  })(req, res, next);
-}
+//       if (!user) { return res.send("Custom Unauthorised").end(); } 
+//       // edit as per comment
+//       //return res.send("Test Route Accessed").end();
+//       req.user = user;   // Forward user information to the next middleware
+//       next();
+//   })(req, res, next);
+// }
 
 app.use('/api/auth', authRouter);
 // catch 404 and forward to error handler
