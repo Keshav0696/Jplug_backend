@@ -32,6 +32,9 @@ var request = require('request');
 require('../passport')();
 
 
+router.get('/check', async function(req, res){
+ res.send("jgdgfhdg")
+})
 // Register User
 router.post('/register', async function(req, res){
      var body = req.body;
