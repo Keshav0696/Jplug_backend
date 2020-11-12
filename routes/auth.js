@@ -42,7 +42,7 @@ router.post('/register', async function(req, res){
         var mailOptions = {
           user: user,
           subject: 'Email Verification',
-          text: `<p>Welcome to Project. Click the below link to activate your account:</p> <br/> <a href='http://localhost:3000/api/auth/verify-email-link/?email=${user.email}&token=${tmpToken}'>Verify Email Now</a>`
+          text: `<p>Welcome to Project. Click the below link to activate your account:</p> <br/> <a href='http://localhost:3400/api/auth/verify-email-link/?email=${user.email}&token=${tmpToken}'>Verify Email Now</a>`
           }
         var registerEmail = Mailer.sendMail(mailOptions);
         registerEmail
@@ -125,102 +125,102 @@ router.post('/register', async function(req, res){
 }
 
 
-//   passport.use(new GoogleTokenStrategy({
-//     clientID: '986961472243-fulld3ffucmhascuns30o5k39i93hktc.apps.googleusercontent.com',
-//     clientSecret: 'TXJjvl8v7n-hX5Arr7LjzboP'
-//   },
-//   function(accessToken, refreshToken, profile, done) {
-//     User.findOne({ 'googleId' : profile.id }, function(err, user) {
-//       if (err) return done(err);
-//       if (user)  {
-//         const token = jwt.sign({user}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
-//         user.token = token;
-//         return done(null, user);
-//     }
-//       else {
-//         // if there is no user found with that facebook id, create them
-//         var newUser = new User();
+  passport.use(new GoogleTokenStrategy({
+    clientID: '986961472243-fulld3ffucmhascuns30o5k39i93hktc.apps.googleusercontent.com',
+    clientSecret: 'TXJjvl8v7n-hX5Arr7LjzboP'
+  },
+  function(accessToken, refreshToken, profile, done) {
+    User.findOne({ 'googleId' : profile.id }, function(err, user) {
+      if (err) return done(err);
+      if (user)  {
+        const token = jwt.sign({user}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
+        user.token = token;
+        return done(null, user);
+    }
+      else {
+        // if there is no user found with that facebook id, create them
+        var newUser = new User();
   
-//         // set all of the facebook information in our user model
-//         newUser.googleId = profile.id;
-//         // newUser.token = accessToken;
-//         const token = jwt.sign({newUser}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
-//         newUser.token = token;
-//         newUser.role = "MEMBER";
-//         newUser.firstname  = profile.displayName.split(' ').slice(0, -1).join(' ');
-//         newUser.lastname  = profile.displayName.split(' ').slice(-1).join(' ');
+        // set all of the facebook information in our user model
+        newUser.googleId = profile.id;
+        // newUser.token = accessToken;
+        const token = jwt.sign({newUser}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
+        newUser.token = token;
+        newUser.role = "MEMBER";
+        newUser.firstname  = profile.displayName.split(' ').slice(0, -1).join(' ');
+        newUser.lastname  = profile.displayName.split(' ').slice(-1).join(' ');
 
-//         newUser.type  = 'google';
-//         if (typeof profile.emails != 'undefined' && profile.emails.length > 0)
-//           newUser.email = profile.emails[0].value;
+        newUser.type  = 'google';
+        if (typeof profile.emails != 'undefined' && profile.emails.length > 0)
+          newUser.email = profile.emails[0].value;
   
-//         // save our user to the database
-//         newUser.save(function(err) {
-//           if (err) throw err;
-//           return done(null, newUser);
-//         });
-//       }
-//     });
-//   }
-// ));
+        // save our user to the database
+        newUser.save(function(err) {
+          if (err) throw err;
+          return done(null, newUser);
+        });
+      }
+    });
+  }
+));
 
-// router.post('/google/token',
-//   passport.authenticate('google-token'),
-//   function (req, res) {
-//     // do something with req.user
-//     // res.send(req.user? 200 : 401);
-//     res.status(req.user? 200 : 401).json({user: req.user}).end();
-//   });
+router.post('/google/token',
+  passport.authenticate('google-token'),
+  function (req, res) {
+    // do something with req.user
+    // res.send(req.user? 200 : 401);
+    res.status(req.user? 200 : 401).json({user: req.user}).end();
+  });
 
 
-//   passport.use(new FacebookTokenStrategy({
-//     // clientID: '578617303046530',
-//     // clientSecret: 'db3754a847c830d48c4b9581138aedc3',
-//     clientID: '188022502647729',
-//     clientSecret: '33a4a4b7898c5d86eca6f3335cbbebd1',
-//     fbGraphVersion: 'v3.0'
-//   }, function(accessToken, refreshToken, profile, done) {
-//     User.findOne({ 'facebookId' : profile.id }, function(err, user) {
-//       if (err) return done(err);
-//       if (user) {
-//           const token = jwt.sign({user}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
-//           user.token = token;
-//           return done(null, user);
-//       }
-//       else {
-//         // if there is no user found with that facebook id, create them
-//         var newUser = new User();
+  passport.use(new FacebookTokenStrategy({
+    // clientID: '578617303046530',
+    // clientSecret: 'db3754a847c830d48c4b9581138aedc3',
+    clientID: '805856186862870',
+    clientSecret: 'f71b203d46e2a3b37ca3e2abb3ff7477',
+    fbGraphVersion: 'v3.0'
+  }, function(accessToken, refreshToken, profile, done) {
+    User.findOne({ 'facebookId' : profile.id }, function(err, user) {
+      if (err) return done(err);
+      if (user) {
+          const token = jwt.sign({user}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
+          user.token = token;
+          return done(null, user);
+      }
+      else {
+        // if there is no user found with that facebook id, create them
+        var newUser = new User();
   
-//         // set all of the facebook information in our user model
-//         newUser.facebookId = profile.id;
-//         const token = jwt.sign({newUser}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
-//         newUser.token = token;
-//         newUser.role = "MEMBER";
-//         newUser.firstname  = profile.displayName.split(' ').slice(0, -1).join(' ');
-//         newUser.lastname  = profile.displayName.split(' ').slice(-1).join(' ');
+        // set all of the facebook information in our user model
+        newUser.facebookId = profile.id;
+        const token = jwt.sign({newUser}, '8A169E5DFB4F18C678DBAD19A4B4A17F1F8154713192E618DCDBF7D8C9E9ABA4');
+        newUser.token = token;
+        newUser.role = "MEMBER";
+        newUser.firstname  = profile.displayName.split(' ').slice(0, -1).join(' ');
+        newUser.lastname  = profile.displayName.split(' ').slice(-1).join(' ');
 
-//         newUser.type  = 'facebook';
-//         if (typeof profile.emails != 'undefined' && profile.emails.length > 0)
-//           newUser.email = profile.emails[0].value;
+        newUser.type  = 'facebook';
+        if (typeof profile.emails != 'undefined' && profile.emails.length > 0)
+          newUser.email = profile.emails[0].value;
   
-//         // save our user to the database
-//         newUser.save(function(err) {
-//           if (err) throw err;
-//           return done(null, newUser);
-//         });
-//       }
-//     });
-//   }
-// ));
+        // save our user to the database
+        newUser.save(function(err) {
+          if (err) throw err;
+          return done(null, newUser);
+        });
+      }
+    });
+  }
+));
 
 
-// router.post('/facebook/token',
-//   passport.authenticate('facebook-token'),
-//   function (req, res) {
-//     // do something with req.user
-//     // res.send(req.user? 200 : 401);
-//     res.status(req.user? 200 : 401).json({user: req.user}).end();
-//   });
+router.post('/facebook/token',
+  passport.authenticate('facebook-token'),
+  function (req, res) {
+    // do something with req.user
+    // res.send(req.user? 200 : 401);
+    res.status(req.user? 200 : 401).json({user: req.user}).end();
+  });
 
   //   // Endpoint to login
 // /* POST login. */

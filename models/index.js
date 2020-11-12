@@ -1,12 +1,6 @@
 'user strict';
 const mongoose = require('mongoose');
 const config = require('../config');
-mongoose.connect(config.dbURI, { 
-	useNewUrlParser: true,
-  	useUnifiedTopology: true,
-  	serverSelectionTimeoutMS: 5000
-});
-mongoose.set('useCreateIndex', true);
-mongoose.connection.on('error', function(err) {
-	if(err) throw err;
-});
+mongoose.connect(process.env.MONGODB_URI ||config.dbURI, { useNewUrlParser: true })
+        .then(connect => console.log('connected to mongodb..'))
+        .catch(e => console.log('could not connect to mongodb', e))
