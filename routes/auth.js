@@ -68,7 +68,7 @@ router.post('/registerForBuyer', async function(req, res){
         var mailOptions = {
           user: user,
           subject: 'Email Verification',
-          text: `<p>Welcome to Project. Click the below link to activate your account:</p> <br/> <a href='http://localhost:3400/api/auth/verify-email-link/?email=${user.email}&token=${tmpToken}'>Verify Email Now</a>`
+          text: `<p>Welcome to Project. Click the below link to activate your account:</p> <br/> <a href='http://localhost:3000/api/auth/verify-email-link/?email=${user.email}&token=${tmpToken}'>Verify Email Now</a>`
           }
         var registerEmail = Mailer.sendMail(mailOptions);
         registerEmail
