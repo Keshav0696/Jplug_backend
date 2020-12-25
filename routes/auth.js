@@ -64,7 +64,7 @@ router.post('/registerForBuyer', async function(req, res){
       User.createUser(newUser, function(err, user){
         try{
         if(err) throw err;
-
+  
         var mailOptions = {
           user: user,
           subject: 'Email Verification',
@@ -83,14 +83,14 @@ router.post('/registerForBuyer', async function(req, res){
         }
         catch(e){
             return  res.status(500).send({status: 500, data: null, message:e.message}).end()
-
+  
         }
       });
     }
     else{
      return  res.status(500).send({status: 500, data: null, message: "User already exist with this email"}).end()
     }
-
+  
   });
 
   function _calculateAge(birthday) { // birthday is a date
