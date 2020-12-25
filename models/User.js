@@ -5,10 +5,30 @@ var bcrypt = require('bcryptjs');
 var UserSchema = mongoose.Schema({
   role : {
     type : String,
-    enum : ["MEMBER", "ADMIN", "VENDOR", "OPERATOR"]
+    enum : ["BUYER", "SELLER"]
   },
-  address : {
+  address1 : {
     type : String,
+  },
+  address2 : {
+    type : String,
+  },
+  is_newsletter : {
+    type : Boolean,
+    default : false
+  },
+  receive_message : {
+        type : Boolean,
+        default : false
+  },
+  username : {
+    type: String
+  },
+  dob : {
+    type : String
+  }, 
+  zip_code : {
+    type : String
   },
   phoneNo : {
     type : String,

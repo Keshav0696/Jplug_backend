@@ -36,13 +36,28 @@ router.get('/check', async function(req, res){
  res.send("jgdgfhdg")
 })
 // Register User
-router.post('/register', async function(req, res){
-     var body = req.body;
-     body.role = body.role || 'MEMBER';
+router.post('/registerForBuyer', async function(req, res){
+     const {username, address1, email, password, dob, zip_code} = req.body;
+     if(!username) { 
+         return  res.status(400).send({status: 400, message: "username is required"}).end()
+     }else if(!address1){
+        return  res.status(400).send({status: 400, message: "address1 is required"}).end()
+     }else if(!email){
+        return  res.status(400).send({status: 400, message: "email is required"}).end()
+     }else if(!password){
+        return  res.status(400).send({status: 400, message: "password is required"}).end()
+     }else if(!dob){
+        return  res.status(400).send({status: 400, message: "dob is required"}).end()
+     }else if(!zip_code){
+        return  res.status(400).send({status: 400, message: "zip_code is required"}).end()
+     }else if(_calculateAge(new Date(dob)) < 21){
+        return  res.status(400).send({status: 400, message: "Your age must be atleast 21"}).end()
+     }
+     req.body.role = req.body.role || 'BUYER';
      var tmpToken = randtoken.generate(30);
-     body.vcode = tmpToken;
-     body.status = 'deactive';
-      var newUser = new User(body);
+     req.body.vcode = tmpToken;
+     req.body.status = 'deactive';
+      var newUser = new User(req.body);
       var found = await User.findOne({ email: req.body.email})
     if(!found){
       User.createUser(newUser, function(err, user){
@@ -66,17 +81,22 @@ router.post('/register', async function(req, res){
        return  res.status(200).send({status: 200, data: newUser}).end();
         }
         catch(e){
-          console.log(e);
+            return  res.status(500).send({status: 500, data: null, message:e.message}).end()
+
         }
       });
     }
     else{
-      res.status(500).send({status: 500, data: null, message: "User already exist with this email"}).end()
+     return  res.status(500).send({status: 500, data: null, message: "User already exist with this email"}).end()
     }
 
   });
 
-
+  function _calculateAge(birthday) { // birthday is a date
+    var ageDifMs = Date.now() - birthday.getTime();
+    var ageDate = new Date(ageDifMs); // miliseconds from epoch
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+}
   router.get('/verify-email-link',    (req,res)=>{
       let response = {};
       let email = req.query.email;
