@@ -69,8 +69,65 @@ app.get('/',  function(req, res){
 res.send("SUCCESS")
 }
 );
-
 const User = mongoose.model('User')
+
+router.post('/registerForBuyer', async function(req, res){
+  console.log("tregevvv")
+   const {username, address1, email, password, dob, zip_code} = req.body;
+   if(!username) { 
+       return  res.status(400).send({status: 400, message: "username is required"}).end()
+   }else if(!address1){
+      return  res.status(400).send({status: 400, message: "address1 is required"}).end()
+   }else if(!email){
+      return  res.status(400).send({status: 400, message: "email is required"}).end()
+   }else if(!password){
+      return  res.status(400).send({status: 400, message: "password is required"}).end()
+   }else if(!dob){
+      return  res.status(400).send({status: 400, message: "dob is required"}).end()
+   }else if(!zip_code){
+      return  res.status(400).send({status: 400, message: "zip_code is required"}).end()
+   }else if(_calculateAge(new Date(dob)) < 21){
+      return  res.status(400).send({status: 400, message: "Your age must be atleast 21"}).end()
+   }
+   req.body.role = req.body.role || 'BUYER';
+   var tmpToken = randtoken.generate(30);
+   req.body.vcode = tmpToken;
+   req.body.status = 'deactive';
+    var newUser = new User(req.body);
+    var found = await User.findOne({ email: req.body.email})
+  if(!found){
+    User.createUser(newUser, function(err, user){
+      try{
+      if(err) throw err;
+
+      // var mailOptions = {
+      //   user: user,
+      //   subject: 'Email Verification',
+      //   text: `<p>Welcome to Project. Click the below link to activate your account:</p> <br/> <a href='http://localhost:3400/api/auth/verify-email-link/?email=${user.email}&token=${tmpToken}'>Verify Email Now</a>`
+      //   }
+      // var registerEmail = Mailer.sendMail(mailOptions);
+      // registerEmail
+      //     .then(sent => {
+      //         let new_message = message.SUCCESSFULL_REGISTRATION;
+      //         console.log(new_message)
+      //     })
+      //     .catch(sentErr => {
+      //         console.log(sentErr)
+      //     })
+     return  res.status(200).send({status: 200, data: newUser}).end();
+      }
+      catch(e){
+          return  res.status(500).send({status: 500, data: null, message:e.message}).end()
+
+      }
+    });
+  }
+  else{
+   return  res.status(500).send({status: 500, data: null, message: "User already exist with this email"}).end()
+  }
+
+});
+
 
 // passport.use(new JWTStrategy({
 //         jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),

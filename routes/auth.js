@@ -37,6 +37,7 @@ router.get('/check', async function(req, res){
 })
 // Register User
 router.post('/registerForBuyer', async function(req, res){
+    console.log("tregevvv")
      const {username, address1, email, password, dob, zip_code} = req.body;
      if(!username) { 
          return  res.status(400).send({status: 400, message: "username is required"}).end()
