@@ -44,6 +44,78 @@ var UserSchema = mongoose.Schema({
    enum : ["active", "deactive"],
    default : "active"
   },
+  businessName :{
+    type: String,
+  },
+  businessEmail :{
+    type: String,
+  },
+  website : {
+    type: String,
+  },
+  businessType : {
+    type : String,
+    enum :["dispensary","delivery service","doctor","smoke shop", "send bank"]
+  },
+  city : {
+    type : String
+  },
+  state :{
+    type : String
+  },
+  lat : {
+    type : Number
+  },
+  lon : {
+    type : Number
+  },
+  ownerFirstname : {
+    type : String
+  },
+  ownerLastname : {
+    type : String
+  },
+  ownerEmail : {
+    type : String
+  },
+  ownerPhone : {
+    type : String
+  },
+  image : {
+   type :String
+  },
+  hours_of_operation:[{
+   day : {
+     type : String,
+   },
+   isWorking :{
+    type : Boolean,
+  },  
+  from :{
+    type : Date,
+  },
+  to :{
+    type : Date,
+  },
+  whole_day : {
+    type : Boolean, 
+  }
+  }],
+  facebook_site : {
+    type: String
+  },
+  twitter_site : {
+    type: String,
+  },
+  google_plus_site : {
+    type: String
+  },
+  pinterest_site : {
+    type: String
+  },
+  instagram_site : {
+    type: String
+  },
 
   facebookProvider: {
     type: {
