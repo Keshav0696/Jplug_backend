@@ -255,7 +255,7 @@ module.exports.getUserByUsername = function(username, callback){
   }
 
   module.exports.getUserByEmail = function(username, callback){
-    var query = {email: username, status : 'active', deleted : {$exists: false}};
+    var query = {email: username, deleted : {$exists: false}};
     User.findOne(query, callback);
   }
   
